@@ -37,7 +37,7 @@ func main() {
 			fmt.Println("error: ", err)
 		}
 
-		echoPort := binary.BigEndian.Uint32(buf[:5])
+		echoPort := binary.BigEndian.Uint32(buf[:4])
 		addr.Port = int(echoPort)
 
 		fmt.Printf("Writing response to %v", *addr)
