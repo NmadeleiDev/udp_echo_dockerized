@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/binary"
 	"fmt"
 	"net"
 	"os"
@@ -29,12 +30,17 @@ func main() {
 
 	for {
 		n, addr, err := ServerConn.ReadFromUDP(buf)
+
 		fmt.Printf("received: '%s' from: %s\n%v\n", string(buf[0:n]), addr.String(), time.Now())
 
 		if err != nil {
 			fmt.Println("error: ", err)
 		}
 
+		echoPort := binary.BigEndian.Uint32(buf[:5])
+		addr.Port = int(echoPort)
+
+		fmt.Printf("Writing responce to %v", *addr)
 		ServerConn.WriteTo(buf[0:n], addr)
 	}
 }
