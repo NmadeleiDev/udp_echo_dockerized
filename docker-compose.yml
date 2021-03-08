@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  search:
+    build:
+      context: ./src
+      dockerfile: Dockerfile
+    ports:
+      - ${LISTEN_PORT}:${LISTEN_PORT}/udp
+      - ${LISTEN_PORT}:${LISTEN_PORT}
+    environment:
+      LISTEN_PORT: ${LISTEN_PORT}
