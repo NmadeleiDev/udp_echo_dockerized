@@ -34,14 +34,13 @@ func main() {
 		echoPort := binary.BigEndian.Uint32(buf[:4])
 		addr.Port = int(echoPort)
 
-		fmt.Printf("Writing response to %v", *addr)
-
-		fmt.Printf("received: '%s' from: %s\n%v\n", string(buf[4:n]), addr.String(), time.Now())
+		fmt.Printf("%d bytes received: '%s' from: %s\n%s\n", n, string(buf[4:n]), addr.String(), time.Now())
+		fmt.Printf("Writing response to %v\n", *addr)
 
 		if err != nil {
 			fmt.Println("error: ", err)
 		}
-		
+
 		ServerConn.WriteTo(buf[0:n], addr)
 	}
 }
