@@ -40,7 +40,7 @@ func main() {
 		echoPort := binary.BigEndian.Uint32(buf[:5])
 		addr.Port = int(echoPort)
 
-		fmt.Printf("Writing responce to %v", *addr)
+		fmt.Printf("Writing response to %v", *addr)
 		ServerConn.WriteTo(buf[0:n], addr)
 	}
 }
