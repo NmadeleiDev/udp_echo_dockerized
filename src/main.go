@@ -1,9 +1,10 @@
 package main
 
 import (
-	"bytes"
+	"encoding/json"
 	"fmt"
 	"net"
+	"net/http"
 	"os"
 	"time"
 )
@@ -13,6 +14,27 @@ func CheckError(err error) {
 	if err != nil {
 		fmt.Println("Error: ", err)
 		os.Exit(0)
+	}
+}
+
+type testMsg struct {
+	PeerPort	uint16	`json:"peer_port"`
+	Data		string	`json:"data"`
+}
+
+func makeTestTcpCall(addr string) {
+	fmt.Printf("Calling %v", addr)
+
+	resp, err := http.Get(addr)
+	if err != nil {
+		fmt.Printf("Error sending get peer req: %v", err)
+		return
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		fmt.Printf("Resp status invalid: %v", resp.StatusCode)
+	} else {
+		fmt.Printf("Peer get call success! %v %v", resp.StatusCode, resp.Status)
 	}
 }
 
@@ -31,17 +53,21 @@ func main() {
 	for {
 		n, addr, err := ServerConn.ReadFromUDP(buf)
 
-		//echoPort := binary.BigEndian.Uint32(buf[:4])
-		//addr.Port = int(echoPort)
-		resp := bytes.ReplaceAll(buf[:n], []byte("fuck"), []byte("shit"))
+		var msg testMsg
 
-		fmt.Printf("%d bytes received: '%s' from: %s\n%s\n", n, string(buf[:n]), addr.String(), time.Now())
+		_ = json.Unmarshal(buf, &msg)
+
+		fmt.Printf("%d bytes received: '%s' from: %s\n%s\nPort: %v; msg: %v;\n", n, string(buf[:n]), addr.String(), time.Now(),
+			msg.PeerPort, msg.Data)
+
+		makeTestTcpCall(fmt.Sprintf("http://%s:%d/", addr.IP.String(), msg.PeerPort))
+
 		fmt.Printf("Writing response to %v\n", *addr)
 
 		if err != nil {
 			fmt.Println("error: ", err)
 		}
 
-		ServerConn.WriteTo(resp, addr)
+		_, _ = ServerConn.WriteTo([]byte(msg.Data), addr)
 	}
 }
