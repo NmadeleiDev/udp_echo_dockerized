@@ -25,7 +25,9 @@ type testMsg struct {
 func makeTestTcpCall(addr string) {
 	fmt.Printf("Calling %v", addr)
 
-	resp, err := http.Get(addr)
+	client := http.Client{Timeout: time.Second * 5}
+
+	resp, err := client.Get(addr)
 	if err != nil {
 		fmt.Printf("Error sending get peer req: %v", err)
 		return
