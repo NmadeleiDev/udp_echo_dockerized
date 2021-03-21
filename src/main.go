@@ -55,7 +55,10 @@ func main() {
 
 		var msg testMsg
 
-		_ = json.Unmarshal(buf, &msg)
+		if err := json.Unmarshal(buf[:n], &msg); err != nil {
+			fmt.Printf("Error unmarshal: %v", err)
+			return
+		}
 
 		fmt.Printf("%d bytes received: '%s' from: %s\n%s\nPort: %v; msg: %v;\n", n, string(buf[:n]), addr.String(), time.Now(),
 			msg.PeerPort, msg.Data)
